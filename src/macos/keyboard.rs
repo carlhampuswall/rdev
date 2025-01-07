@@ -145,25 +145,122 @@ impl Keyboard {
         }
     }
 
+    // #[inline]
+    // unsafe fn unicode_from_code(
+    //     &mut self,
+    //     code: u32,
+    //     modifier_state: ModifierState,
+    // ) -> Option<String> {
+    //     let mut keyboard = TISCopyCurrentKeyboardInputSource();
+    //     let mut layout = TISGetInputSourceProperty(keyboard, kTISPropertyUnicodeKeyLayoutData);
+
+    //     if layout.is_null() {
+    //         // TISGetInputSourceProperty returns NULL when using CJK input methods,
+    //         // using TISCopyCurrentKeyboardLayoutInputSource to fix it.
+    //         keyboard = TISCopyCurrentKeyboardLayoutInputSource();
+    //         layout = TISGetInputSourceProperty(keyboard, kTISPropertyUnicodeKeyLayoutData);
+    //         if layout.is_null() {
+    //             return None;
+    //         }
+    //     }
+    //     let layout_ptr = CFDataGetBytePtr(layout);
+    // ) -> Option<UnicodeInfo> {
+    //     // let mut now = std::time::Instant::now();
+    //     let mut keyboard = TISCopyCurrentKeyboardInputSource();
+    //     let mut layout = std::ptr::null_mut();
+    //     if !keyboard.is_null() {
+    //         layout = TISGetInputSourceProperty(keyboard, kTISPropertyUnicodeKeyLayoutData);
+    //     }
+    //     if layout.is_null() {
+    //         if !keyboard.is_null() {
+    //             CFRelease(keyboard);
+    //         }
+    //         // https://github.com/microsoft/vscode/issues/23833
+    //         keyboard = TISCopyCurrentKeyboardLayoutInputSource();
+    //         if !keyboard.is_null() {
+    //             layout = TISGetInputSourceProperty(keyboard, kTISPropertyUnicodeKeyLayoutData);
+    //         }
+    //     }
+    //     if layout.is_null() {
+    //         if !keyboard.is_null() {
+    //             CFRelease(keyboard);
+    //         }
+    //         keyboard = TISCopyCurrentASCIICapableKeyboardLayoutInputSource();
+    //         if !keyboard.is_null() {
+    //             layout = TISGetInputSourceProperty(keyboard, kTISPropertyUnicodeKeyLayoutData);
+    //         }
+    //     }
+    //     if layout.is_null() {
+    //         if !keyboard.is_null() {
+    //             CFRelease(keyboard);
+    //         }
+    //         return None;
+    //     }
+    //     let layout_ptr = CFDataGetBytePtr(layout as _);
+    //     if layout_ptr.is_null() {
+    //         if !keyboard.is_null() {
+    //             CFRelease(keyboard);
+    //         }
+    //         return None;
+    //     }
+    //     // println!("{:?}", now.elapsed());
+
+    //     let mut buff = [0_u16; BUF_LEN];
+    //     let kb_type = super::common::LMGetKbdType();
+    //     let mut length = 0;
+    //     let _retval = UCKeyTranslate(
+    //         layout_ptr,
+    //         code.try_into().ok()?,
+    //         kUCKeyActionDown,
+    //         modifier_state,
+    //         kb_type as _,
+    //         kUCKeyTranslateDeadKeysBit,
+    //         &mut self.dead_state,
+    //         BUF_LEN,
+    //         &mut length,
+    //         &mut buff,
+    //     );
+    //     if !keyboard.is_null() {
+    //         CFRelease(keyboard);
+    //     }
+    //     if length == 0 {
+    //         return if self.is_dead() {
+    //             Some(UnicodeInfo {
+    //                 name: None,
+    //                 unicode: Vec::new(),
+    //                 is_dead: true,
+    //             })
+    //         } else {
+    //             None
+    //         };
+    //     }
+
+    //     // C0 controls
+    //     if length == 1 {
+    //         match String::from_utf16(&buff[..length].to_vec()) {
+    //             Ok(s) => {
+    //                 if let Some(c) = s.chars().next() {
+    //                     if ('\u{1}'..='\u{1f}').contains(&c) {
+    //                         return None;
+    //                     }
+    //                 }
+    //             }
+    //             Err(_) => {}
+    //         }
+    //     }
+
+    //     let unicode = buff[..length].to_vec();
+    //     Some(UnicodeInfo {
+    //         name: String::from_utf16(&unicode).ok(),
+    //         unicode,
+    //         is_dead: false,
+    //     })
+    // }
     #[inline]
     unsafe fn unicode_from_code(
         &mut self,
         code: u32,
         modifier_state: ModifierState,
-    ) -> Option<String> {
-        let mut keyboard = TISCopyCurrentKeyboardInputSource();
-        let mut layout = TISGetInputSourceProperty(keyboard, kTISPropertyUnicodeKeyLayoutData);
-
-        if layout.is_null() {
-            // TISGetInputSourceProperty returns NULL when using CJK input methods,
-            // using TISCopyCurrentKeyboardLayoutInputSource to fix it.
-            keyboard = TISCopyCurrentKeyboardLayoutInputSource();
-            layout = TISGetInputSourceProperty(keyboard, kTISPropertyUnicodeKeyLayoutData);
-            if layout.is_null() {
-                return None;
-            }
-        }
-        let layout_ptr = CFDataGetBytePtr(layout);
     ) -> Option<UnicodeInfo> {
         // let mut now = std::time::Instant::now();
         let mut keyboard = TISCopyCurrentKeyboardInputSource();

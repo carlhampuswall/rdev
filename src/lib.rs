@@ -238,6 +238,9 @@ pub use crate::codes_conv::*;
 pub use keycodes::android::{
     code_from_key as android_keycode_from_key, key_from_code as android_key_from_code,
 };
+pub use keycodes::chrome::{
+    code_from_key as chrome_keycode_from_key, key_from_code as chrome_key_from_code,
+};
 pub use keycodes::linux::{
     code_from_key as linux_keycode_from_key, key_from_code as linux_key_from_code,
 };
@@ -251,9 +254,6 @@ pub use keycodes::windows::{
     code_from_key as win_code_from_key, code_from_key as win_keycode_from_key, get_win_codes,
     get_win_key, key_from_code as win_key_from_keycode, key_from_scancode as win_key_from_scancode,
     scancode_from_key as win_scancode_from_key,
-};
-pub use keycodes::chrome::{
-    code_from_key as chrome_keycode_from_key, key_from_code as chrome_key_from_code,
 };
 
 #[cfg(target_os = "macos")]
@@ -279,12 +279,9 @@ pub use crate::linux::{simulate_char, simulate_unicode, Keyboard};
 pub use crate::keycodes::windows::key_from_scancode;
 #[cfg(target_os = "windows")]
 pub use crate::windows::{
-    
     display_size as _display_size, get_modifier, listen as _listen, set_modifier,
-    simulate as _simulate,
-    stop_listen as _stop_listen,
-, simulate_char, simulate_code, simulate_key_unicode, simulate_unicode,
-    simulate_unistr, vk_to_scancode, Keyboard,
+    simulate as _simulate, simulate_char, simulate_code, simulate_key_unicode, simulate_unicode,
+    simulate_unistr, stop_listen as _stop_listen, vk_to_scancode, Keyboard,
 };
 
 pub use crate::rdev::UnicodeInfo;
@@ -384,13 +381,13 @@ pub use crate::macos::set_mouse_extra_info;
 #[cfg(target_os = "macos")]
 pub use crate::macos::{exit_grab, grab as _grab, is_grabbed};
 #[cfg(target_os = "windows")]
+pub use crate::windows::grab as _grab;
+#[cfg(target_os = "windows")]
 pub use crate::windows::set_keyboard_extra_info;
 #[cfg(target_os = "windows")]
 pub use crate::windows::set_mouse_extra_info;
 #[cfg(target_os = "windows")]
 pub use crate::windows::{exit_grab, grab as _grab, is_grabbed};
-#[cfg(target_os = "windows")]
-pub use crate::windows::grab as _grab;
 #[cfg(feature = "unstable_grab")]
 pub use crate::windows::{set_event_popup, set_get_key_unicode};
 

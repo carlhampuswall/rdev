@@ -165,6 +165,9 @@ unsafe fn get_current_mouse_location() -> Option<CGPoint> {
     Some(event.location())
 }
 
+#[link(name = "Cocoa", kind = "framework")]
+extern "C" {}
+
 pub fn simulate(event_type: &EventType) -> Result<(), SimulateError> {
     unsafe {
         if let Some(cg_event) = convert_native(event_type) {

@@ -334,10 +334,12 @@ impl KeyboardState for Keyboard {
                     None
                 }
                 Key::CapsLock => {
-                    self.last_state[VK_CAPITAL_] ^= HIGHBIT;
+                    self.last_state[VK_CAPITAL_] ^= 1;
                     None
                 }
                 key => {
+                    let code = code_from_key(*key)?; // tODO look at if it works or not
+                    unsafe { self.get_code_name(code.into(), 0) }
                     let (code, scan_code) = crate::get_win_codes(*key)?;
 
                     unsafe {

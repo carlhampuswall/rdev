@@ -259,7 +259,10 @@ pub use keycodes::chrome::{
 #[cfg(target_os = "macos")]
 pub use crate::keycodes::macos::{code_from_key, key_from_code, virtual_keycodes::*};
 #[cfg(target_os = "macos")]
-use crate::macos::{display_size as _display_size, listen as _listen, simulate as _simulate};
+use crate::macos::{
+    display_size as _display_size, listen as _listen, simulate as _simulate,
+    stop_listen as _stop_listen,
+};
 #[cfg(target_os = "macos")]
 pub use crate::macos::{set_is_main_thread, Keyboard, VirtualInput};
 #[cfg(target_os = "macos")]
@@ -276,8 +279,11 @@ pub use crate::linux::{simulate_char, simulate_unicode, Keyboard};
 pub use crate::keycodes::windows::key_from_scancode;
 #[cfg(target_os = "windows")]
 pub use crate::windows::{
+    
     display_size as _display_size, get_modifier, listen as _listen, set_modifier,
-    simulate as _simulate, simulate_char, simulate_code, simulate_key_unicode, simulate_unicode,
+    simulate as _simulate,
+    stop_listen as _stop_listen,
+, simulate_char, simulate_code, simulate_key_unicode, simulate_unicode,
     simulate_unistr, vk_to_scancode, Keyboard,
 };
 
@@ -310,6 +316,10 @@ where
     T: FnMut(Event) + 'static,
 {
     _listen(callback)
+}
+
+pub fn stop_listen() {
+    _stop_listen();
 }
 
 /// Sending some events
@@ -380,6 +390,8 @@ pub use crate::windows::set_mouse_extra_info;
 #[cfg(target_os = "windows")]
 pub use crate::windows::{exit_grab, grab as _grab, is_grabbed};
 #[cfg(target_os = "windows")]
+pub use crate::windows::grab as _grab;
+#[cfg(feature = "unstable_grab")]
 pub use crate::windows::{set_event_popup, set_get_key_unicode};
 
 /// Grabbing global events. In the callback, returning None ignores the event
@@ -407,7 +419,7 @@ pub use crate::windows::{set_event_popup, set_get_key_unicode};
 ///     }
 /// }
 /// ```
-#[cfg(not(any(target_os = "android", target_os = "ios", target_os = "linux")))]
+#[cfg(not(target_os = "android", target_os = "ios", target_os = "linux"))]
 pub fn grab<T>(callback: T) -> Result<(), GrabError>
 where
     T: Fn(Event) -> Option<Event> + 'static,
@@ -466,6 +478,22 @@ mod tests {
         // let n = keyboard.add(&EventType::KeyRelease(Key::KeyS));
         // assert_eq!(n, None);
         // keyboard.add(&EventType::KeyRelease(Key::ShiftLeft));
+
+        // CapsLock
+        let char_c = keyboard.add(&EventType::KeyPress(Key::KeyC)).unwrap();
+        assert_eq!(char_c, "c".to_string());
+        keyboard.add(&EventType::KeyPress(Key::CapsLock));
+        keyboard.add(&EventType::KeyRelease(Key::CapsLock));
+        let char_c = keyboard.add(&EventType::KeyPress(Key::KeyC)).unwrap();
+        assert_eq!(char_c, "C".to_string());
+        let n = keyboard.add(&EventType::KeyRelease(Key::KeyS));
+        assert_eq!(n, None);
+        keyboard.add(&EventType::KeyPress(Key::CapsLock));
+        keyboard.add(&EventType::KeyRelease(Key::CapsLock));
+        let char_c = keyboard.add(&EventType::KeyPress(Key::KeyC)).unwrap();
+        assert_eq!(char_c, "c".to_string());
+        let n = keyboard.add(&EventType::KeyRelease(Key::KeyS));
+        assert_eq!(n, None);
 
         // UsIntl layout required
         // let n = keyboard.add(&EventType::KeyPress(Key::Quote));

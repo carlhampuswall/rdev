@@ -96,7 +96,6 @@ extern "C" {
     pub fn CGEventTapEnable(tap: CFMachPortRef, enable: bool);
     pub fn CFRunLoopRun();
     pub fn CFRunLoopStop(rl: CFRunLoopRef);
-
     pub static kCFRunLoopCommonModes: CFRunLoopMode;
 }
 
@@ -108,6 +107,10 @@ extern "C" {
     pub fn KBGetLayoutType(iKeyboardType: SInt16) -> PhysicalKeyboardLayoutType;
 }
 
+// TODO Remove this, this was added as the coded
+// existed and worked, but clippy is complaining.
+// There's probably a better fix.
+#[allow(improper_ctypes_definitions)]
 pub type QCallback = unsafe extern "C" fn(
     proxy: CGEventTapProxy,
     _type: CGEventType,

@@ -8,6 +8,9 @@ use std::os::raw::c_void;
 
 static mut GLOBAL_CALLBACK: Option<Box<dyn FnMut(Event) -> Option<Event>>> = None;
 
+#[link(name = "Cocoa", kind = "framework")]
+extern "C" {}
+
 unsafe extern "C" fn raw_callback(
     _proxy: CGEventTapProxy,
     _type: CGEventType,
@@ -34,9 +37,7 @@ static mut CUR_LOOP: CFRunLoopSourceRef = std::ptr::null_mut();
 
 #[inline]
 pub fn is_grabbed() -> bool {
-    unsafe {
-        !CUR_LOOP.is_null()
-    }
+    unsafe { !CUR_LOOP.is_null() }
 }
 
 pub fn grab<T>(callback: T) -> Result<(), GrabError>

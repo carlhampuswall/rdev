@@ -62,6 +62,7 @@ lazy_static::lazy_static! {
 #[link(name = "Cocoa", kind = "framework")]
 #[link(name = "Carbon", kind = "framework")]
 extern "C" {
+    fn TISCopyCurrentKeyboardLayoutInputSource() -> TISInputSourceRef;
     fn TISCopyCurrentKeyboardInputSource() -> TISInputSourceRef;
     fn TISCopyCurrentKeyboardLayoutInputSource() -> TISInputSourceRef;
     fn TISCopyCurrentASCIICapableKeyboardLayoutInputSource() -> TISInputSourceRef;
@@ -149,6 +150,20 @@ impl Keyboard {
         &mut self,
         code: u32,
         modifier_state: ModifierState,
+    ) -> Option<String> {
+        let mut keyboard = TISCopyCurrentKeyboardInputSource();
+        let mut layout = TISGetInputSourceProperty(keyboard, kTISPropertyUnicodeKeyLayoutData);
+
+        if layout.is_null() {
+            // TISGetInputSourceProperty returns NULL when using CJK input methods,
+            // using TISCopyCurrentKeyboardLayoutInputSource to fix it.
+            keyboard = TISCopyCurrentKeyboardLayoutInputSource();
+            layout = TISGetInputSourceProperty(keyboard, kTISPropertyUnicodeKeyLayoutData);
+            if layout.is_null() {
+                return None;
+            }
+        }
+        let layout_ptr = CFDataGetBytePtr(layout);
     ) -> Option<UnicodeInfo> {
         // let mut now = std::time::Instant::now();
         let mut keyboard = TISCopyCurrentKeyboardInputSource();
